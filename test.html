@@ -1,0 +1,1450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WorkForce — Employee & Project Manager</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Fraunces:ital,wght@0,300;0,600;1,300&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #F4F1EB;
+    --surface: #FDFCF9;
+    --surface2: #EDE9E0;
+    --border: #D5CFC3;
+    --border2: #C2BAB0;
+    --text: #1A1714;
+    --text2: #6B6560;
+    --text3: #9C9590;
+    --accent: #2D5A27;
+    --accent-light: #EDF4EC;
+    --accent-text: #1E3D1A;
+    --danger: #8B2020;
+    --danger-light: #FAF0F0;
+    --warn: #7A4A0A;
+    --warn-light: #FEF5E7;
+    --info: #1A3D6B;
+    --info-light: #EDF2FA;
+    --purple: #3D2B6B;
+    --purple-light: #F0ECFA;
+    --radius: 10px;
+    --radius-lg: 14px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.10);
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  /* HEADER */
+  .header {
+    background: var(--text);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 32px;
+    height: 58px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .header-logo {
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -0.5px;
+    color: #fff;
+  }
+  .header-logo span { color: #7EC87A; }
+  .header-meta { font-size: 12px; color: rgba(255,255,255,0.45); }
+
+  /* TABS */
+  .tabs {
+    display: flex;
+    gap: 4px;
+    padding: 20px 32px 0;
+  }
+  .tab {
+    padding: 10px 22px;
+    border-radius: var(--radius) var(--radius) 0 0;
+    border: 1px solid transparent;
+    border-bottom: none;
+    background: transparent;
+    color: var(--text2);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .tab:hover { background: var(--surface2); color: var(--text); }
+  .tab.active {
+    background: var(--surface);
+    border-color: var(--border);
+    color: var(--text);
+    font-weight: 600;
+  }
+  .tab-icon { font-size: 15px; }
+
+  /* MAIN */
+  .main {
+    padding: 0 32px 40px;
+  }
+  .panel {
+    display: none;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 0 var(--radius-lg) var(--radius-lg) var(--radius-lg);
+    min-height: 600px;
+    overflow: hidden;
+  }
+  .panel.active { display: block; }
+
+  /* TOOLBAR */
+  .toolbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 18px 24px;
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+  .toolbar-title {
+    font-family: 'Fraunces', serif;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text);
+    flex: 1;
+  }
+  .search-wrap { position: relative; }
+  .search-wrap input {
+    padding: 8px 12px 8px 34px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    width: 220px;
+    outline: none;
+    transition: border 0.15s;
+  }
+  .search-wrap input:focus { border-color: var(--border2); background: var(--surface); }
+  .search-icon {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text3);
+    font-size: 14px;
+    pointer-events: none;
+  }
+
+  /* BUTTONS */
+  .btn {
+    padding: 8px 16px;
+    border-radius: var(--radius);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+  }
+  .btn:hover { background: var(--surface2); border-color: var(--border2); }
+  .btn-primary {
+    background: var(--text);
+    color: #fff;
+    border-color: var(--text);
+  }
+  .btn-primary:hover { background: #333; }
+  .btn-danger { background: var(--danger-light); color: var(--danger); border-color: #F5CCCC; }
+  .btn-danger:hover { background: #F5CCCC; }
+  .btn-sm { padding: 5px 10px; font-size: 12px; }
+  .btn-icon { padding: 6px 8px; }
+
+  /* TABLE */
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; }
+  thead th {
+    text-align: left;
+    padding: 10px 16px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--text2);
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+    white-space: nowrap;
+  }
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.1s;
+  }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: var(--accent-light); }
+  td { padding: 12px 16px; font-size: 13px; vertical-align: middle; }
+
+  /* AVATAR */
+  .avatar {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+  .avatar-name { display: flex; align-items: center; gap: 10px; }
+  .avatar-name .name { font-weight: 500; }
+  .avatar-name .sub { font-size: 12px; color: var(--text2); }
+
+  /* BADGES */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .badge-green { background: var(--accent-light); color: var(--accent-text); }
+  .badge-blue { background: var(--info-light); color: var(--info); }
+  .badge-amber { background: var(--warn-light); color: var(--warn); }
+  .badge-red { background: var(--danger-light); color: var(--danger); }
+  .badge-purple { background: var(--purple-light); color: var(--purple); }
+  .badge-gray { background: var(--surface2); color: var(--text2); }
+
+  /* DEPT SELECT */
+  select {
+    padding: 7px 10px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    cursor: pointer;
+    outline: none;
+  }
+  select:focus { border-color: var(--border2); }
+
+  /* MODAL */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(20,18,15,0.55);
+    z-index: 500;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    width: 100%;
+    max-width: 520px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: var(--shadow-md);
+  }
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .modal-title {
+    font-family: 'Fraunces', serif;
+    font-size: 18px;
+    font-weight: 600;
+  }
+  .modal-close {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    border: none;
+    background: var(--surface2);
+    cursor: pointer;
+    font-size: 16px;
+    color: var(--text2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-close:hover { background: var(--border); color: var(--text); }
+  .modal-body { padding: 20px 24px; }
+  .modal-footer { padding: 16px 24px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 8px; }
+
+  /* FORM */
+  .form-group { margin-bottom: 16px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  label { display: block; font-size: 12px; font-weight: 600; color: var(--text2); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
+  input[type=text], input[type=email], input[type=tel], input[type=date], input[type=number], textarea, .form-select {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    outline: none;
+    transition: border 0.15s;
+  }
+  input:focus, textarea:focus, .form-select:focus { border-color: var(--border2); background: var(--surface); }
+  textarea { resize: vertical; min-height: 80px; }
+
+  /* EMPTY STATE */
+  .empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    color: var(--text2);
+    gap: 12px;
+    text-align: center;
+  }
+  .empty-icon { font-size: 40px; opacity: 0.35; }
+  .empty h3 { font-size: 15px; font-weight: 600; color: var(--text); }
+  .empty p { font-size: 13px; max-width: 280px; }
+
+  /* STATS BAR */
+  .stats-bar {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  .stat-item {
+    background: var(--surface);
+    padding: 16px 20px;
+    text-align: center;
+  }
+  .stat-num { font-size: 24px; font-weight: 600; font-family: 'Fraunces', serif; color: var(--text); line-height: 1.1; }
+  .stat-label { font-size: 11px; color: var(--text2); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  /* PROJECT CARDS */
+  .projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 16px;
+    padding: 20px 24px;
+  }
+  .project-card {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    overflow: hidden;
+    transition: box-shadow 0.15s;
+  }
+  .project-card:hover { box-shadow: var(--shadow-md); }
+  .project-card-header {
+    padding: 16px 18px 12px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .project-card-title { font-weight: 600; font-size: 15px; line-height: 1.3; }
+  .project-card-meta { font-size: 12px; color: var(--text2); margin-top: 3px; }
+  .project-card-body { padding: 12px 18px; }
+  .project-card-desc { font-size: 13px; color: var(--text2); margin-bottom: 12px; }
+  .project-card-footer {
+    padding: 10px 18px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .progress-bar {
+    height: 5px;
+    background: var(--surface2);
+    border-radius: 99px;
+    overflow: hidden;
+    flex: 1;
+    margin: 0 8px;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 99px;
+    transition: width 0.3s;
+  }
+  .project-card-actions { display: flex; gap: 4px; }
+
+  /* TASKS SECTION */
+  .tasks-section { padding: 0 24px 20px; }
+  .tasks-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 0 8px;
+    margin-top: 8px;
+  }
+  .tasks-title { font-size: 13px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.5px; }
+  .task-item {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 10px 14px;
+    margin-bottom: 6px;
+    background: var(--bg);
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    transition: all 0.1s;
+  }
+  .task-item:hover { background: var(--surface); border-color: var(--border2); }
+  .task-info { flex: 1; min-width: 0; }
+  .task-name { font-weight: 500; font-size: 13px; }
+  .task-sub { font-size: 12px; color: var(--text2); margin-top: 2px; }
+  .task-actions { display: flex; gap: 4px; flex-shrink: 0; }
+
+  /* STATUS SELECT */
+  .status-select {
+    padding: 4px 8px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    border: 1px solid transparent;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236B6560' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 6px center;
+    padding-right: 22px;
+  }
+  .status-todo { background: var(--surface2); color: var(--text2); border-color: var(--border); }
+  .status-inprogress { background: var(--info-light); color: var(--info); border-color: #BDD0F0; }
+  .status-review { background: var(--warn-light); color: var(--warn); border-color: #FAD98F; }
+  .status-done { background: var(--accent-light); color: var(--accent-text); border-color: #B5D6B2; }
+
+  /* PROJECT STATUS BADGE */
+  .proj-status {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+
+  /* CONFIRM MODAL */
+  .confirm-modal { max-width: 380px; }
+  .confirm-msg { font-size: 14px; color: var(--text2); margin-top: 6px; }
+
+  /* DETAIL PANEL */
+  .detail-panel {
+    display: none;
+  }
+  .detail-panel.open {
+    display: block;
+    padding: 20px 24px 30px;
+  }
+  .back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--text2);
+    cursor: pointer;
+    margin-bottom: 16px;
+    padding: 4px 0;
+  }
+  .back-btn:hover { color: var(--text); }
+
+  .section-divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 20px 0;
+  }
+
+  .chip-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+  .chip {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    background: var(--surface2);
+    color: var(--text);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .chip .remove {
+    cursor: pointer;
+    color: var(--text2);
+    font-size: 14px;
+    line-height: 1;
+  }
+  .chip .remove:hover { color: var(--danger); }
+
+  /* KANBAN */
+  .kanban {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    padding: 20px 24px;
+  }
+  .kanban-col {
+    background: var(--bg);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    min-height: 300px;
+  }
+  .kanban-col-header {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .kanban-count {
+    font-size: 11px;
+    padding: 2px 7px;
+    border-radius: 20px;
+    background: var(--surface2);
+    color: var(--text2);
+    font-weight: 600;
+  }
+  .kanban-body { padding: 10px; display: flex; flex-direction: column; gap: 8px; min-height: 200px; }
+  .kanban-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+  .kanban-card-title { font-weight: 500; margin-bottom: 4px; }
+  .kanban-card-sub { font-size: 11px; color: var(--text2); }
+
+  .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+
+  @media (max-width: 700px) {
+    .header, .tabs, .main { padding-left: 16px; padding-right: 16px; }
+    .form-row { grid-template-columns: 1fr; }
+    .kanban { grid-template-columns: 1fr 1fr; }
+    .projects-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-logo">Work<span>Force</span></div>
+  <div class="header-meta" id="header-meta">0 employees · 0 projects</div>
+</header>
+
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('employees')">
+    <span class="tab-icon">👤</span> Employees
+  </button>
+  <button class="tab" onclick="switchTab('projects')">
+    <span class="tab-icon">📁</span> Projects
+  </button>
+</div>
+
+<div class="main">
+
+  <!-- ══════════════════ EMPLOYEES PANEL ══════════════════ -->
+  <div class="panel active" id="panel-employees">
+
+    <div class="stats-bar" id="emp-stats"></div>
+
+    <div class="toolbar">
+      <div class="toolbar-title">All Employees</div>
+      <div class="search-wrap">
+        <span class="search-icon">⌕</span>
+        <input type="text" id="emp-search" placeholder="Search employees…" oninput="renderEmployees()">
+      </div>
+      <select id="emp-dept-filter" onchange="renderEmployees()">
+        <option value="">All Departments</option>
+      </select>
+      <button class="btn btn-primary" onclick="openEmployeeModal()">+ Add Employee</button>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Employee</th>
+            <th>Department</th>
+            <th>Role</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="emp-tbody"></tbody>
+      </table>
+      <div id="emp-empty" class="empty" style="display:none;">
+        <div class="empty-icon">👥</div>
+        <h3>No employees found</h3>
+        <p>Add your first employee or adjust your search filters.</p>
+        <button class="btn btn-primary" onclick="openEmployeeModal()">+ Add Employee</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════ PROJECTS PANEL ══════════════════ -->
+  <div class="panel" id="panel-projects">
+
+    <!-- LIST VIEW -->
+    <div id="proj-list-view">
+      <div class="stats-bar" id="proj-stats"></div>
+      <div class="toolbar">
+        <div class="toolbar-title">Projects</div>
+        <div class="search-wrap">
+          <span class="search-icon">⌕</span>
+          <input type="text" id="proj-search" placeholder="Search projects…" oninput="renderProjects()">
+        </div>
+        <select id="proj-status-filter" onchange="renderProjects()">
+          <option value="">All Statuses</option>
+          <option value="planning">Planning</option>
+          <option value="active">Active</option>
+          <option value="on-hold">On Hold</option>
+          <option value="completed">Completed</option>
+        </select>
+        <button class="btn btn-primary" onclick="openProjectModal()">+ New Project</button>
+      </div>
+      <div class="projects-grid" id="proj-grid"></div>
+      <div id="proj-empty" class="empty" style="display:none;">
+        <div class="empty-icon">📁</div>
+        <h3>No projects yet</h3>
+        <p>Create your first project and start assigning tasks.</p>
+        <button class="btn btn-primary" onclick="openProjectModal()">+ New Project</button>
+      </div>
+    </div>
+
+    <!-- DETAIL VIEW -->
+    <div class="detail-panel" id="proj-detail-view">
+      <div style="padding: 20px 24px 0;">
+        <div class="back-btn" onclick="closeProjectDetail()">← Back to Projects</div>
+        <div id="detail-content"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════ EMPLOYEE MODAL ══════ -->
+<div class="modal-overlay" id="emp-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="emp-modal-title">Add Employee</div>
+      <button class="modal-close" onclick="closeModal('emp-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label>First Name</label>
+          <input type="text" id="emp-fname" placeholder="Jane">
+        </div>
+        <div class="form-group">
+          <label>Last Name</label>
+          <input type="text" id="emp-lname" placeholder="Smith">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="emp-email" placeholder="jane@company.com">
+        </div>
+        <div class="form-group">
+          <label>Phone</label>
+          <input type="tel" id="emp-phone" placeholder="+1 555 0100">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Department</label>
+          <input type="text" id="emp-dept" placeholder="e.g. Engineering" list="dept-datalist">
+          <datalist id="dept-datalist"></datalist>
+        </div>
+        <div class="form-group">
+          <label>Role / Title</label>
+          <input type="text" id="emp-role" placeholder="e.g. Senior Engineer">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Start Date</label>
+          <input type="date" id="emp-startdate">
+        </div>
+        <div class="form-group">
+          <label>Status</label>
+          <select id="emp-status" class="form-select">
+            <option value="active">Active</option>
+            <option value="remote">Remote</option>
+            <option value="on-leave">On Leave</option>
+            <option value="contract">Contract</option>
+          </select>
+        </div>
+      </div>
+      <div id="emp-error" style="color: var(--danger); font-size: 12px; margin-top: 4px; display:none;"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('emp-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveEmployee()">Save Employee</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ PROJECT MODAL ══════ -->
+<div class="modal-overlay" id="proj-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="proj-modal-title">New Project</div>
+      <button class="modal-close" onclick="closeModal('proj-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Project Name</label>
+        <input type="text" id="proj-name" placeholder="e.g. Customer Portal Redesign">
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        <textarea id="proj-desc" placeholder="Brief overview of the project…"></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Start Date</label>
+          <input type="date" id="proj-start">
+        </div>
+        <div class="form-group">
+          <label>Due Date</label>
+          <input type="date" id="proj-due">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Status</label>
+          <select id="proj-status" class="form-select">
+            <option value="planning">Planning</option>
+            <option value="active">Active</option>
+            <option value="on-hold">On Hold</option>
+            <option value="completed">Completed</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Priority</label>
+          <select id="proj-priority" class="form-select">
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Project Manager</label>
+        <select id="proj-manager" class="form-select">
+          <option value="">Select manager…</option>
+        </select>
+      </div>
+      <div id="proj-error" style="color: var(--danger); font-size: 12px; margin-top: 4px; display:none;"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('proj-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveProject()">Save Project</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ TASK MODAL ══════ -->
+<div class="modal-overlay" id="task-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="task-modal-title">New Task</div>
+      <button class="modal-close" onclick="closeModal('task-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Task Name</label>
+        <input type="text" id="task-name" placeholder="e.g. Design wireframes">
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        <textarea id="task-desc" placeholder="What needs to be done…" style="min-height:60px;"></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Assignee</label>
+          <select id="task-assignee" class="form-select">
+            <option value="">Unassigned</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Status</label>
+          <select id="task-status" class="form-select">
+            <option value="todo">To Do</option>
+            <option value="inprogress">In Progress</option>
+            <option value="review">Review</option>
+            <option value="done">Done</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Priority</label>
+          <select id="task-priority" class="form-select">
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Due Date</label>
+          <input type="date" id="task-due">
+        </div>
+      </div>
+      <div id="task-error" style="color: var(--danger); font-size: 12px; margin-top: 4px; display:none;"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('task-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveTask()">Save Task</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ CONFIRM MODAL ══════ -->
+<div class="modal-overlay" id="confirm-modal">
+  <div class="modal confirm-modal">
+    <div class="modal-header">
+      <div class="modal-title" id="confirm-title">Confirm Delete</div>
+      <button class="modal-close" onclick="closeModal('confirm-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="confirm-msg" class="confirm-msg"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('confirm-modal')">Cancel</button>
+      <button class="btn btn-danger" id="confirm-ok-btn">Delete</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════════════
+let employees = JSON.parse(localStorage.getItem('wf_employees') || '[]');
+let projects = JSON.parse(localStorage.getItem('wf_projects') || '[]');
+let tasks = JSON.parse(localStorage.getItem('wf_tasks') || '[]');
+
+let editEmpId = null;
+let editProjId = null;
+let editTaskId = null;
+let currentProjId = null;
+
+const AVATAR_COLORS = [
+  '#2D5A27','#1A3D6B','#3D2B6B','#7A4A0A','#8B2020',
+  '#1E5C5C','#4A3000','#2A4A1E','#003D5C','#5C1A5C'
+];
+
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2); }
+
+function save() {
+  localStorage.setItem('wf_employees', JSON.stringify(employees));
+  localStorage.setItem('wf_projects', JSON.stringify(projects));
+  localStorage.setItem('wf_tasks', JSON.stringify(tasks));
+  updateHeaderMeta();
+}
+
+function updateHeaderMeta() {
+  document.getElementById('header-meta').textContent =
+    `${employees.length} employee${employees.length !== 1 ? 's' : ''} · ${projects.length} project${projects.length !== 1 ? 's' : ''}`;
+}
+
+// ══════════════════════════════════════════════════
+//  TABS
+// ══════════════════════════════════════════════════
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach((t, i) => {
+    t.classList.toggle('active', ['employees','projects'][i] === tab);
+  });
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + tab).classList.add('active');
+  if (tab === 'employees') renderEmployees();
+  if (tab === 'projects') renderProjects();
+}
+
+// ══════════════════════════════════════════════════
+//  MODAL HELPERS
+// ══════════════════════════════════════════════════
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+// ══════════════════════════════════════════════════
+//  EMPLOYEES
+// ══════════════════════════════════════════════════
+function getInitials(fname, lname) {
+  return ((fname[0] || '') + (lname[0] || '')).toUpperCase();
+}
+function avatarColor(name) {
+  let h = 0;
+  for (let c of name) h = (h * 31 + c.charCodeAt(0)) % AVATAR_COLORS.length;
+  return AVATAR_COLORS[h];
+}
+
+function empStatusBadge(s) {
+  const m = { active:'badge-green', remote:'badge-blue', 'on-leave':'badge-amber', contract:'badge-purple' };
+  return `<span class="badge ${m[s]||'badge-gray'}">${s}</span>`;
+}
+
+function renderEmployees() {
+  const q = (document.getElementById('emp-search').value || '').toLowerCase();
+  const dept = document.getElementById('emp-dept-filter').value;
+
+  // update dept filter
+  const depts = [...new Set(employees.map(e => e.dept).filter(Boolean))].sort();
+  const df = document.getElementById('emp-dept-filter');
+  const cur = df.value;
+  df.innerHTML = '<option value="">All Departments</option>' + depts.map(d => `<option value="${d}"${d===cur?' selected':''}>${d}</option>`).join('');
+
+  // also update datalist
+  document.getElementById('dept-datalist').innerHTML = depts.map(d => `<option value="${d}">`).join('');
+
+  let filtered = employees.filter(e => {
+    const name = `${e.fname} ${e.lname}`.toLowerCase();
+    const matchQ = !q || name.includes(q) || (e.email||'').toLowerCase().includes(q) || (e.role||'').toLowerCase().includes(q);
+    const matchD = !dept || e.dept === dept;
+    return matchQ && matchD;
+  });
+
+  // stats
+  const total = employees.length;
+  const deptCount = new Set(employees.map(e => e.dept).filter(Boolean)).size;
+  const active = employees.filter(e => e.status === 'active').length;
+  document.getElementById('emp-stats').innerHTML = `
+    <div class="stat-item"><div class="stat-num">${total}</div><div class="stat-label">Total</div></div>
+    <div class="stat-item"><div class="stat-num">${active}</div><div class="stat-label">Active</div></div>
+    <div class="stat-item"><div class="stat-num">${deptCount}</div><div class="stat-label">Departments</div></div>
+    <div class="stat-item"><div class="stat-num">${employees.filter(e=>e.status==='remote').length}</div><div class="stat-label">Remote</div></div>
+  `;
+
+  const tbody = document.getElementById('emp-tbody');
+  if (filtered.length === 0) {
+    tbody.innerHTML = '';
+    document.getElementById('emp-empty').style.display = 'flex';
+    return;
+  }
+  document.getElementById('emp-empty').style.display = 'none';
+
+  tbody.innerHTML = filtered.map(e => {
+    const color = avatarColor(e.fname + e.lname);
+    return `<tr>
+      <td>
+        <div class="avatar-name">
+          <div class="avatar" style="background:${color}20;color:${color}">${getInitials(e.fname,e.lname)}</div>
+          <div>
+            <div class="name">${e.fname} ${e.lname}</div>
+            ${e.startdate ? `<div class="sub">Since ${fmtDate(e.startdate)}</div>` : ''}
+          </div>
+        </div>
+      </td>
+      <td>${e.dept || '<span style="color:var(--text3)">—</span>'}</td>
+      <td>${e.role || '<span style="color:var(--text3)">—</span>'}</td>
+      <td><a href="mailto:${e.email}" style="color:var(--info);text-decoration:none;">${e.email}</a></td>
+      <td>${e.phone || '<span style="color:var(--text3)">—</span>'}</td>
+      <td>${empStatusBadge(e.status)}</td>
+      <td>
+        <div style="display:flex;gap:6px;">
+          <button class="btn btn-sm" onclick="openEmployeeModal('${e.id}')">Edit</button>
+          <button class="btn btn-sm btn-danger" onclick="confirmDelete('employee','${e.id}','${e.fname} ${e.lname}')">Delete</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function openEmployeeModal(id) {
+  editEmpId = id || null;
+  const title = id ? 'Edit Employee' : 'Add Employee';
+  document.getElementById('emp-modal-title').textContent = title;
+  clearError('emp-error');
+
+  if (id) {
+    const e = employees.find(x => x.id === id);
+    document.getElementById('emp-fname').value = e.fname;
+    document.getElementById('emp-lname').value = e.lname;
+    document.getElementById('emp-email').value = e.email;
+    document.getElementById('emp-phone').value = e.phone || '';
+    document.getElementById('emp-dept').value = e.dept || '';
+    document.getElementById('emp-role').value = e.role || '';
+    document.getElementById('emp-startdate').value = e.startdate || '';
+    document.getElementById('emp-status').value = e.status;
+  } else {
+    ['emp-fname','emp-lname','emp-email','emp-phone','emp-dept','emp-role','emp-startdate'].forEach(f => document.getElementById(f).value = '');
+    document.getElementById('emp-status').value = 'active';
+  }
+  openModal('emp-modal');
+}
+
+function saveEmployee() {
+  const fname = document.getElementById('emp-fname').value.trim();
+  const lname = document.getElementById('emp-lname').value.trim();
+  const email = document.getElementById('emp-email').value.trim();
+  if (!fname || !lname) return showError('emp-error', 'First and last name are required.');
+  if (!email) return showError('emp-error', 'Email is required.');
+
+  const data = {
+    id: editEmpId || uid(),
+    fname, lname, email,
+    phone: document.getElementById('emp-phone').value.trim(),
+    dept: document.getElementById('emp-dept').value.trim(),
+    role: document.getElementById('emp-role').value.trim(),
+    startdate: document.getElementById('emp-startdate').value,
+    status: document.getElementById('emp-status').value,
+  };
+
+  if (editEmpId) {
+    employees = employees.map(e => e.id === editEmpId ? data : e);
+  } else {
+    employees.push(data);
+  }
+  save();
+  closeModal('emp-modal');
+  renderEmployees();
+}
+
+// ══════════════════════════════════════════════════
+//  PROJECTS
+// ══════════════════════════════════════════════════
+const PROJ_STATUS = {
+  planning: { label: 'Planning', cls: 'badge-purple' },
+  active: { label: 'Active', cls: 'badge-green' },
+  'on-hold': { label: 'On Hold', cls: 'badge-amber' },
+  completed: { label: 'Completed', cls: 'badge-blue' },
+};
+const PRIORITY = {
+  low: { label: 'Low', cls: 'badge-gray' },
+  medium: { label: 'Medium', cls: 'badge-amber' },
+  high: { label: 'High', cls: 'badge-red' },
+};
+
+function renderProjects() {
+  const q = (document.getElementById('proj-search').value || '').toLowerCase();
+  const statusF = document.getElementById('proj-status-filter').value;
+
+  let filtered = projects.filter(p => {
+    const matchQ = !q || p.name.toLowerCase().includes(q) || (p.desc||'').toLowerCase().includes(q);
+    const matchS = !statusF || p.status === statusF;
+    return matchQ && matchS;
+  });
+
+  // stats
+  const total = projects.length;
+  const active = projects.filter(p => p.status === 'active').length;
+  const tasksDone = tasks.filter(t => t.status === 'done').length;
+  document.getElementById('proj-stats').innerHTML = `
+    <div class="stat-item"><div class="stat-num">${total}</div><div class="stat-label">Total</div></div>
+    <div class="stat-item"><div class="stat-num">${active}</div><div class="stat-label">Active</div></div>
+    <div class="stat-item"><div class="stat-num">${projects.filter(p=>p.status==='completed').length}</div><div class="stat-label">Completed</div></div>
+    <div class="stat-item"><div class="stat-num">${tasks.length}</div><div class="stat-label">Tasks</div></div>
+    <div class="stat-item"><div class="stat-num">${tasksDone}</div><div class="stat-label">Done</div></div>
+  `;
+
+  const grid = document.getElementById('proj-grid');
+  if (filtered.length === 0) {
+    grid.innerHTML = '';
+    document.getElementById('proj-empty').style.display = 'flex';
+    return;
+  }
+  document.getElementById('proj-empty').style.display = 'none';
+
+  grid.innerHTML = filtered.map(p => {
+    const manager = employees.find(e => e.id === p.managerId);
+    const projTasks = tasks.filter(t => t.projectId === p.id);
+    const done = projTasks.filter(t => t.status === 'done').length;
+    const pct = projTasks.length ? Math.round(done / projTasks.length * 100) : 0;
+    const st = PROJ_STATUS[p.status] || { label: p.status, cls: 'badge-gray' };
+    const pr = PRIORITY[p.priority] || { label: p.priority, cls: 'badge-gray' };
+
+    return `<div class="project-card">
+      <div class="project-card-header">
+        <div>
+          <div class="project-card-title">${p.name}</div>
+          <div class="project-card-meta">${p.due ? 'Due ' + fmtDate(p.due) : 'No due date'} · ${projTasks.length} task${projTasks.length !== 1 ? 's' : ''}</div>
+        </div>
+        <span class="badge ${st.cls}">${st.label}</span>
+      </div>
+      <div class="project-card-body">
+        <div class="project-card-desc">${p.desc || '<em style="color:var(--text3)">No description</em>'}</div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          ${manager ? `<div class="avatar" style="width:24px;height:24px;font-size:10px;background:${avatarColor(manager.fname+manager.lname)}20;color:${avatarColor(manager.fname+manager.lname)}">${getInitials(manager.fname,manager.lname)}</div>
+          <span style="font-size:12px;color:var(--text2)">${manager.fname} ${manager.lname}</span>` : '<span style="font-size:12px;color:var(--text3)">No manager assigned</span>'}
+          <span class="badge ${pr.cls}" style="margin-left:auto;">${pr.label}</span>
+        </div>
+      </div>
+      <div class="project-card-footer">
+        <span style="font-size:11px;color:var(--text2)">${pct}%</span>
+        <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+        <div class="project-card-actions">
+          <button class="btn btn-sm" onclick="openProjectDetail('${p.id}')">Open</button>
+          <button class="btn btn-sm" onclick="openProjectModal('${p.id}')">Edit</button>
+          <button class="btn btn-sm btn-danger" onclick="confirmDelete('project','${p.id}','${p.name}')">Del</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openProjectModal(id) {
+  editProjId = id || null;
+  document.getElementById('proj-modal-title').textContent = id ? 'Edit Project' : 'New Project';
+  clearError('proj-error');
+
+  // populate manager select
+  const msel = document.getElementById('proj-manager');
+  msel.innerHTML = '<option value="">Select manager…</option>' +
+    employees.map(e => `<option value="${e.id}">${e.fname} ${e.lname} — ${e.dept||'No dept'}</option>`).join('');
+
+  if (id) {
+    const p = projects.find(x => x.id === id);
+    document.getElementById('proj-name').value = p.name;
+    document.getElementById('proj-desc').value = p.desc || '';
+    document.getElementById('proj-start').value = p.start || '';
+    document.getElementById('proj-due').value = p.due || '';
+    document.getElementById('proj-status').value = p.status;
+    document.getElementById('proj-priority').value = p.priority || 'medium';
+    document.getElementById('proj-manager').value = p.managerId || '';
+  } else {
+    ['proj-name','proj-desc','proj-start','proj-due'].forEach(f => document.getElementById(f).value = '');
+    document.getElementById('proj-status').value = 'planning';
+    document.getElementById('proj-priority').value = 'medium';
+    document.getElementById('proj-manager').value = '';
+  }
+  openModal('proj-modal');
+}
+
+function saveProject() {
+  const name = document.getElementById('proj-name').value.trim();
+  if (!name) return showError('proj-error', 'Project name is required.');
+
+  const data = {
+    id: editProjId || uid(),
+    name,
+    desc: document.getElementById('proj-desc').value.trim(),
+    start: document.getElementById('proj-start').value,
+    due: document.getElementById('proj-due').value,
+    status: document.getElementById('proj-status').value,
+    priority: document.getElementById('proj-priority').value,
+    managerId: document.getElementById('proj-manager').value,
+  };
+
+  if (editProjId) {
+    projects = projects.map(p => p.id === editProjId ? data : p);
+  } else {
+    projects.push(data);
+  }
+  save();
+  closeModal('proj-modal');
+  if (currentProjId) { openProjectDetail(data.id); } else { renderProjects(); }
+}
+
+// ══════════════════════════════════════════════════
+//  PROJECT DETAIL
+// ══════════════════════════════════════════════════
+function openProjectDetail(id) {
+  currentProjId = id;
+  document.getElementById('proj-list-view').style.display = 'none';
+  document.getElementById('proj-detail-view').classList.add('open');
+  renderDetail();
+}
+
+function closeProjectDetail() {
+  currentProjId = null;
+  document.getElementById('proj-list-view').style.display = 'block';
+  document.getElementById('proj-detail-view').classList.remove('open');
+  renderProjects();
+}
+
+function renderDetail() {
+  const p = projects.find(x => x.id === currentProjId);
+  if (!p) return closeProjectDetail();
+  const manager = employees.find(e => e.id === p.managerId);
+  const projTasks = tasks.filter(t => t.projectId === p.id);
+  const st = PROJ_STATUS[p.status] || { label: p.status, cls: 'badge-gray' };
+  const pr = PRIORITY[p.priority] || { label: p.priority, cls: 'badge-gray' };
+  const done = projTasks.filter(t => t.status === 'done').length;
+  const pct = projTasks.length ? Math.round(done / projTasks.length * 100) : 0;
+
+  const statuses = ['todo','inprogress','review','done'];
+  const statusLabels = { todo:'To Do', inprogress:'In Progress', review:'Review', done:'Done' };
+
+  const kanbanCols = statuses.map(s => {
+    const col = projTasks.filter(t => t.status === s);
+    return `<div class="kanban-col">
+      <div class="kanban-col-header">
+        ${statusLabels[s]}
+        <span class="kanban-count">${col.length}</span>
+      </div>
+      <div class="kanban-body">
+        ${col.map(t => {
+          const assignee = employees.find(e => e.id === t.assigneeId);
+          return `<div class="kanban-card">
+            <div class="kanban-card-title">${t.name}</div>
+            <div class="kanban-card-sub">
+              ${assignee ? assignee.fname + ' ' + assignee.lname : 'Unassigned'}
+              ${t.due ? ' · Due ' + fmtDate(t.due) : ''}
+            </div>
+          </div>`;
+        }).join('')}
+        ${col.length === 0 ? '<div style="font-size:12px;color:var(--text3);text-align:center;padding:16px 0;">Empty</div>' : ''}
+      </div>
+    </div>`;
+  }).join('');
+
+  const taskList = projTasks.map(t => {
+    const assignee = employees.find(e => e.id === t.assigneeId);
+    const pr2 = PRIORITY[t.priority] || { label: t.priority, cls: 'badge-gray' };
+    return `<div class="task-item">
+      <div class="task-info">
+        <div class="task-name">${t.name}</div>
+        <div class="task-sub">
+          ${assignee ? `<span>👤 ${assignee.fname} ${assignee.lname}</span>` : '<span>Unassigned</span>'}
+          ${t.due ? ` · Due ${fmtDate(t.due)}` : ''}
+          ${t.desc ? ` · ${t.desc.slice(0,60)}${t.desc.length>60?'…':''}` : ''}
+        </div>
+      </div>
+      <span class="badge ${pr2.cls}">${pr2.label}</span>
+      <select class="status-select status-${t.status}" onchange="updateTaskStatus('${t.id}', this.value)">
+        <option value="todo"${t.status==='todo'?' selected':''}>To Do</option>
+        <option value="inprogress"${t.status==='inprogress'?' selected':''}>In Progress</option>
+        <option value="review"${t.status==='review'?' selected':''}>Review</option>
+        <option value="done"${t.status==='done'?' selected':''}>Done</option>
+      </select>
+      <div class="task-actions">
+        <button class="btn btn-sm" onclick="openTaskModal('${t.id}')">Edit</button>
+        <button class="btn btn-sm btn-danger" onclick="confirmDelete('task','${t.id}','${t.name}')">Del</button>
+      </div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('detail-content').innerHTML = `
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+      <div>
+        <h1 style="font-family:'Fraunces',serif;font-size:26px;font-weight:600;">${p.name}</h1>
+        <div style="color:var(--text2);font-size:13px;margin-top:4px;">${p.desc || ''}</div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+        <span class="badge ${st.cls}">${st.label}</span>
+        <span class="badge ${pr.cls}">${pr.label}</span>
+        <button class="btn btn-sm" onclick="openProjectModal('${p.id}')">Edit Project</button>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;background:var(--border);border-radius:var(--radius);overflow:hidden;margin-top:20px;">
+      <div style="background:var(--surface);padding:14px 16px;">
+        <div style="font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Manager</div>
+        <div style="font-weight:500;">${manager ? manager.fname+' '+manager.lname : '—'}</div>
+      </div>
+      <div style="background:var(--surface);padding:14px 16px;">
+        <div style="font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Start</div>
+        <div style="font-weight:500;">${p.start ? fmtDate(p.start) : '—'}</div>
+      </div>
+      <div style="background:var(--surface);padding:14px 16px;">
+        <div style="font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Due</div>
+        <div style="font-weight:500;">${p.due ? fmtDate(p.due) : '—'}</div>
+      </div>
+      <div style="background:var(--surface);padding:14px 16px;">
+        <div style="font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Progress</div>
+        <div style="font-weight:500;">${pct}% (${done}/${projTasks.length})</div>
+      </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+      <div style="font-size:15px;font-weight:600;">Tasks (${projTasks.length})</div>
+      <button class="btn btn-primary btn-sm" onclick="openTaskModal()">+ Add Task</button>
+    </div>
+
+    <div class="kanban">${kanbanCols}</div>
+
+    <hr class="section-divider">
+
+    <div style="font-size:13px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;">Task List</div>
+    ${taskList || '<div style="color:var(--text3);font-size:13px;padding:10px 0;">No tasks yet. Add one above.</div>'}
+  `;
+}
+
+// ══════════════════════════════════════════════════
+//  TASKS
+// ══════════════════════════════════════════════════
+function openTaskModal(id) {
+  editTaskId = id || null;
+  document.getElementById('task-modal-title').textContent = id ? 'Edit Task' : 'New Task';
+  clearError('task-error');
+
+  const asel = document.getElementById('task-assignee');
+  asel.innerHTML = '<option value="">Unassigned</option>' +
+    employees.map(e => `<option value="${e.id}">${e.fname} ${e.lname}</option>`).join('');
+
+  if (id) {
+    const t = tasks.find(x => x.id === id);
+    document.getElementById('task-name').value = t.name;
+    document.getElementById('task-desc').value = t.desc || '';
+    document.getElementById('task-assignee').value = t.assigneeId || '';
+    document.getElementById('task-status').value = t.status;
+    document.getElementById('task-priority').value = t.priority || 'medium';
+    document.getElementById('task-due').value = t.due || '';
+  } else {
+    ['task-name','task-desc','task-due'].forEach(f => document.getElementById(f).value = '');
+    document.getElementById('task-assignee').value = '';
+    document.getElementById('task-status').value = 'todo';
+    document.getElementById('task-priority').value = 'medium';
+  }
+  openModal('task-modal');
+}
+
+function saveTask() {
+  const name = document.getElementById('task-name').value.trim();
+  if (!name) return showError('task-error', 'Task name is required.');
+
+  const data = {
+    id: editTaskId || uid(),
+    projectId: currentProjId,
+    name,
+    desc: document.getElementById('task-desc').value.trim(),
+    assigneeId: document.getElementById('task-assignee').value,
+    status: document.getElementById('task-status').value,
+    priority: document.getElementById('task-priority').value,
+    due: document.getElementById('task-due').value,
+  };
+
+  if (editTaskId) {
+    tasks = tasks.map(t => t.id === editTaskId ? data : t);
+  } else {
+    tasks.push(data);
+  }
+  save();
+  closeModal('task-modal');
+  renderDetail();
+}
+
+function updateTaskStatus(id, status) {
+  tasks = tasks.map(t => t.id === id ? {...t, status} : t);
+  save();
+  renderDetail();
+}
+
+// ══════════════════════════════════════════════════
+//  DELETE
+// ══════════════════════════════════════════════════
+function confirmDelete(type, id, name) {
+  document.getElementById('confirm-title').textContent = `Delete ${type === 'employee' ? 'Employee' : type === 'project' ? 'Project' : 'Task'}`;
+  document.getElementById('confirm-msg').textContent = `Are you sure you want to delete "${name}"? This cannot be undone.`;
+  const btn = document.getElementById('confirm-ok-btn');
+  btn.onclick = () => {
+    if (type === 'employee') {
+      employees = employees.filter(e => e.id !== id);
+    } else if (type === 'project') {
+      projects = projects.filter(p => p.id !== id);
+      tasks = tasks.filter(t => t.projectId !== id);
+      if (currentProjId === id) closeProjectDetail();
+    } else if (type === 'task') {
+      tasks = tasks.filter(t => t.id !== id);
+    }
+    save();
+    closeModal('confirm-modal');
+    if (type === 'employee') renderEmployees();
+    else if (type === 'project') renderProjects();
+    else renderDetail();
+  };
+  openModal('confirm-modal');
+}
+
+// ══════════════════════════════════════════════════
+//  UTILS
+// ══════════════════════════════════════════════════
+function fmtDate(str) {
+  if (!str) return '';
+  const d = new Date(str + 'T00:00:00');
+  return d.toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
+}
+function showError(id, msg) {
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+function clearError(id) {
+  const el = document.getElementById(id);
+  el.textContent = '';
+  el.style.display = 'none';
+}
+
+// close modal on overlay click
+document.querySelectorAll('.modal-overlay').forEach(o => {
+  o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); });
+});
+
+// ══════════════════════════════════════════════════
+//  SEED DATA
+// ══════════════════════════════════════════════════
+function seedData() {
+  if (employees.length > 0) return;
+  employees = [
+    { id: 'e1', fname: 'Priya', lname: 'Mehta', email: 'priya.mehta@company.com', phone: '+91 98765 43210', dept: 'Engineering', role: 'Senior Engineer', startdate: '2022-03-15', status: 'active' },
+    { id: 'e2', fname: 'Arjun', lname: 'Sharma', email: 'arjun.sharma@company.com', phone: '+91 98765 11111', dept: 'Engineering', role: 'Product Manager', startdate: '2021-07-01', status: 'active' },
+    { id: 'e3', fname: 'Sneha', lname: 'Iyer', email: 'sneha.iyer@company.com', phone: '+91 98765 22222', dept: 'Design', role: 'UX Designer', startdate: '2023-01-10', status: 'remote' },
+    { id: 'e4', fname: 'Rohan', lname: 'Gupta', email: 'rohan.gupta@company.com', phone: '', dept: 'Marketing', role: 'Marketing Lead', startdate: '2020-11-20', status: 'active' },
+    { id: 'e5', fname: 'Ananya', lname: 'Patel', email: 'ananya.patel@company.com', phone: '+91 98765 55555', dept: 'Design', role: 'Graphic Designer', startdate: '2023-06-01', status: 'contract' },
+  ];
+  projects = [
+    { id: 'p1', name: 'Customer Portal Redesign', desc: 'Modernise the customer-facing portal with a new design system.', start: '2025-01-01', due: '2025-06-30', status: 'active', priority: 'high', managerId: 'e2' },
+    { id: 'p2', name: 'Internal Analytics Dashboard', desc: 'Build a reporting dashboard for ops and finance teams.', start: '2025-02-15', due: '2025-08-01', status: 'planning', priority: 'medium', managerId: 'e1' },
+  ];
+  tasks = [
+    { id: 't1', projectId: 'p1', name: 'Audit current portal', desc: 'Document all current flows and pain points.', assigneeId: 'e3', status: 'done', priority: 'high', due: '2025-02-01' },
+    { id: 't2', projectId: 'p1', name: 'Design new wireframes', desc: 'Create low-fi wireframes for all main screens.', assigneeId: 'e3', status: 'done', priority: 'high', due: '2025-03-01' },
+    { id: 't3', projectId: 'p1', name: 'Build component library', desc: 'Code reusable UI components in React.', assigneeId: 'e1', status: 'inprogress', priority: 'medium', due: '2025-04-15' },
+    { id: 't4', projectId: 'p1', name: 'Write API integration', desc: 'Connect portal to backend APIs.', assigneeId: 'e1', status: 'inprogress', priority: 'high', due: '2025-05-01' },
+    { id: 't5', projectId: 'p1', name: 'Marketing launch plan', desc: '', assigneeId: 'e4', status: 'todo', priority: 'low', due: '2025-06-01' },
+    { id: 't6', projectId: 'p2', name: 'Gather requirements', desc: '', assigneeId: 'e2', status: 'review', priority: 'medium', due: '2025-03-15' },
+    { id: 't7', projectId: 'p2', name: 'Design data model', desc: '', assigneeId: 'e1', status: 'todo', priority: 'high', due: '2025-04-01' },
+  ];
+  save();
+}
+
+// ══════════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════════
+seedData();
+renderEmployees();
+updateHeaderMeta();
+</script>
+</body>
+</html>
